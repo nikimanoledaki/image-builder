@@ -20,6 +20,7 @@ RUN make LOCALVERSION= olddefconfig
 # -j32 tells the compiler to use 32 threads, if 32 threads are not available it will use as many as it can up to 32
 RUN make LOCALVERSION= -j32
 RUN make LOCALVERSION= modules_install
+RUN make LOCALVERSION= headers_install
 
 RUN cp vmlinux /boot/vmlinux && \
     cp .config /boot/config-${KERNEL_VERSION}
@@ -27,3 +28,4 @@ RUN cp vmlinux /boot/vmlinux && \
 FROM scratch
 COPY --from=builder /boot /boot
 COPY --from=builder /lib/modules /lib/modules
+
