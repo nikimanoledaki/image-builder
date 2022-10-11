@@ -16,14 +16,20 @@ WORKDIR ${LINUX_DIR}
 
 COPY configs/linux-x86_64-${KERNEL_VERSION}.config .config
 
-RUN make LOCALVERSION= olddefconfig
+RUN apt install -y python3 cpio
+RUN make olddefconfig
+RUN make modules_prepare
 # -j32 tells the compiler to use 32 threads, if 32 threads are not available it will use as many as it can up to 32
-RUN make LOCALVERSION= -j32
-RUN make LOCALVERSION= modules_install
+RUN make -j32
+RUN make modules_install
+RUN make headers_install
 
 RUN cp vmlinux /boot/vmlinux && \
     cp .config /boot/config-${KERNEL_VERSION}
 
+# FROM ubuntu:20.04
 FROM scratch
 COPY --from=builder /boot /boot
 COPY --from=builder /lib/modules /lib/modules
+COPY --from=builder /usr/include /usr/include
+COPY --from=builder /usr/src/linux /usr/src/linux
